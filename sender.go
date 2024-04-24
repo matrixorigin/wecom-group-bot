@@ -2,7 +2,6 @@ package wecom_group_bot
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/matrixorigin/wecom-group-bot/utils"
@@ -35,7 +34,6 @@ func (s *Sender) Send() error {
 	url := utils.URL{
 		RawURL: s.webhook,
 	}
-	fmt.Printf("string(payload): %v\n", string(payload))
 	_, err = utils.PostWithRetry(url, payload, 5, 10*time.Second)
 	return err
 }
