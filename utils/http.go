@@ -114,7 +114,7 @@ func Get(url URL) (reply *Reply, err error) {
 		nil,
 	)
 	if err != nil {
-		return reply, errors.Join(ErrHttpRequest, err)
+		return reply, errors.Join(ErrHttpNewRequest, err)
 	}
 	return resolveReply(do(req))
 }
@@ -126,7 +126,7 @@ func Post(url URL, body []byte) (reply *Reply, err error) {
 		bytes.NewReader(body),
 	)
 	if err != nil {
-		return reply, errors.Join(ErrHttpRequest, err)
+		return reply, errors.Join(ErrHttpNewRequest, err)
 	}
 	return resolveReply(do(req))
 }
@@ -151,10 +151,7 @@ func do(req *http.Request) (reply *Reply, err error) {
 	// read reply from resp
 	reply.Body, err = io.ReadAll(resp.Body)
 	defer resp.Body.Close()
-	if err != nil {
-		return reply, err
-	}
-	return reply, nil
+	return reply, err
 }
 
 func newHttpClient(timeOut time.Duration) *http.Client {
@@ -178,14 +175,14 @@ func resolveReply(reply *Reply, err error) (*Reply, error) {
 		return reply, err
 	}
 
-	// return error if rate limited
-	if err = checkReplyErrorCode(reply); err != nil {
-		return nil, err
-	}
-
 	// return error if reply.statuscode != 2xx
 	if reply.StatusCode >= 300 {
 		return reply, errors.Join(ErrHttpResponse, errors.New(fmt.Sprintf("status: %d, resp message: %s", reply.StatusCode, string(reply.Body))))
+	}
+
+	// check reply error code and related error message
+	if err = checkReplyErrorCode(reply); err != nil {
+		return nil, err
 	}
 
 	return reply, nil
