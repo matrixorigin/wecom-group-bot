@@ -8,8 +8,10 @@ const (
 	FileType     = "file"
 	VoiceType    = "voice"
 	CardType     = "template_card"
+
+	MediaType = "media"
 )
 
 const (
-	WebhookEnvName = "WebHook"
+	WebhookKeyEnvName = "WebHookKey"
 )

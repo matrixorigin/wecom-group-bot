@@ -7,13 +7,18 @@ import (
 	"github.com/matrixorigin/wecom-group-bot/utils"
 )
 
+const (
+	NoticePrefix      = "https://qyapi.weixin.qq.com/cgi-bin/webhook/send"
+	UploadMediaPrefix = "https://qyapi.weixin.qq.com/cgi-bin/webhook/upload_media"
+)
+
 type Sender struct {
-	webhook string
+	key string
 }
 
-func NewSender(webhook string) *Sender {
+func NewSender(key string) *Sender {
 	return &Sender{
-		webhook: webhook,
+		key: key,
 	}
 }
 
@@ -25,20 +30,31 @@ func (s *Sender) Send(message Messager) error {
 		return err
 	}
 
-	payload, err := json.Marshal(message)
-	if err != nil {
-		return err
-	}
 	url := utils.URL{
-		RawURL: s.webhook,
+		Params: map[string]string{
+			"key": s.key,
+		},
 	}
-	_, err = utils.PostWithRetry(url, payload, 5, 10*time.Second)
-	return err
+	switch message.GetType() {
+	case MediaType:
+		url.Endpoint = UploadMediaPrefix
+		return utils.UploadMedia(url)
+	case TextType, MarkdownType, ImageType, NewsType, FileType, VoiceType, CardType:
+		url.Endpoint = NoticePrefix
+		payload, err := json.Marshal(message)
+		if err != nil {
+			return err
+		}
+		_, err = utils.PostWithRetry(url, payload, 5, 10*time.Second)
+		return err
+	default:
+		return ErrInvalidType
+	}
 }
 
 func (s *Sender) Validate() error {
-	if s.webhook == "" {
-		return ErrEmptyWebhook
+	if s.key == "" {
+		return ErrEmptyWebhookKey
 	}
 	return nil
 }

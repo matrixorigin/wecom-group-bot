@@ -7,8 +7,8 @@ import (
 	"github.com/matrixorigin/wecom-group-bot/utils"
 )
 
-func Test_TextSend(t *testing.T) {
-	sender := NewSender(utils.MustGetEnv(WebhookEnvName))
+func Test_TextSender(t *testing.T) {
+	sender := NewSender(utils.MustGetEnv(WebhookKeyEnvName))
 	message := NewTextMessage(&Text{
 		Content:             "test test test",
 		MentionedList:       []string{""},
