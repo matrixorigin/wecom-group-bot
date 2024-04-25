@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -68,7 +67,9 @@ func (s *Sender) startServer() error {
 				case <-ctx.Done():
 					needExit = true
 				case message := <-backoff:
-					fmt.Printf("message.GetID(): %v\n", message.GetID())
+					if backOffTime := message.GetBackOff(); backOffTime != nil {
+						time.Sleep(time.Minute)
+					}
 					queue <- message
 				case message := <-messageChan:
 					backoff <- message
@@ -89,6 +90,7 @@ func (s *Sender) startServer() error {
 				result := sendMessage(url, message, 5, 5*time.Second)
 				// if err is rate limited error
 				if result.Status == BackOffStatus {
+					message.SetBackOff(time.Now())
 					backoff <- message
 				}
 				resultChan <- result
@@ -119,13 +121,12 @@ func (s *Sender) Send(message Messager) (id int32, err error) {
 }
 
 func (s *Sender) WaitResult(id int32) *Result {
-	for i := 0; i < 300; i++ {
-		if result := s.GetResult(id); result != nil {
+	for {
+		result := s.GetResult(id)
+		if result != nil {
 			return result
 		}
-		time.Sleep(time.Second)
 	}
-	return nil
 }
 
 func (s *Sender) GetResult(id int32) *Result {
@@ -141,10 +142,10 @@ func (s *Sender) GetResult(id int32) *Result {
 	s.resultMapLock.Unlock()
 
 	s.resultMapLock.RLock()
+	defer s.resultMapLock.RUnlock()
 	if value, ok := s.resultMap[id]; ok {
 		return &value
 	}
-	s.resultMapLock.RUnlock()
 	return nil
 }
 
@@ -154,7 +155,6 @@ func (s *Sender) readResultWithSelect() *Result {
 	case <-timer.C:
 		return nil
 	case result := <-s.result:
-		fmt.Printf("result.Status: %v\n", result.Status)
 		return &result
 	default:
 		return nil
@@ -184,7 +184,6 @@ func sendMessage(url utils.URL, message Messager, retryTimes int, retryDuration 
 		return result
 	}
 	_, err = utils.PostWithRetry(url, payload, retryTimes, retryDuration)
-	fmt.Printf("err: %v\n", err)
 	result.Err = err
 	switch {
 	case errors.Is(err, utils.ErrRateLimited):
@@ -205,4 +204,7 @@ type Messager interface {
 
 	SetID(int32)
 	GetID() int32
+
+	SetBackOff(t time.Time)
+	GetBackOff() *time.Time
 }

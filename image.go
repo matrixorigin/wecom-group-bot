@@ -3,6 +3,7 @@ package wecom_group_bot
 import (
 	"errors"
 	"strings"
+	"time"
 )
 
 type ImageMessage struct {
@@ -40,6 +41,16 @@ func (i *ImageMessage) SetID(id int32) {
 
 func (i *ImageMessage) GetID() int32 {
 	return i.id
+}
+
+func (i *ImageMessage) SetBackOff(t time.Time) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (i *ImageMessage) GetBackOff() *time.Time {
+	//TODO implement me
+	panic("implement me")
 }
 
 type Image struct {

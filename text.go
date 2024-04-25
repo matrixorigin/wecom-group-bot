@@ -1,6 +1,9 @@
 package wecom_group_bot
 
-import "strings"
+import (
+	"strings"
+	"time"
+)
 
 func NewTextMessage(text *Text) *TextMessage {
 	return &TextMessage{
@@ -11,9 +14,10 @@ func NewTextMessage(text *Text) *TextMessage {
 }
 
 type TextMessage struct {
-	id      int32
-	Msgtype string `json:"msgtype,omitempty"`
-	Text    *Text  `json:"text,omitempty"`
+	id          int32
+	backOffTime *time.Time
+	Msgtype     string `json:"msgtype,omitempty"`
+	Text        *Text  `json:"text,omitempty"`
 }
 
 func (t *TextMessage) GetType() string {
@@ -43,6 +47,14 @@ func (t *TextMessage) SetID(id int32) {
 
 func (t *TextMessage) GetID() int32 {
 	return t.id
+}
+
+func (t *TextMessage) SetBackOff(tt time.Time) {
+	t.backOffTime = &tt
+}
+
+func (t *TextMessage) GetBackOff() *time.Time {
+	return t.backOffTime
 }
 
 type Text struct {

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 )
 
 type MarkdownMessage struct {
@@ -43,6 +44,16 @@ func (m *MarkdownMessage) SetID(id int32) {
 
 func (m *MarkdownMessage) GetID() int32 {
 	return m.id
+}
+
+func (m *MarkdownMessage) SetBackOff(t time.Time) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MarkdownMessage) GetBackOff() *time.Time {
+	//TODO implement me
+	panic("implement me")
 }
 
 type Markdown struct {

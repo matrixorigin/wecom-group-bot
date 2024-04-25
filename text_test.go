@@ -3,6 +3,7 @@ package wecom_group_bot
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/matrixorigin/wecom-group-bot/utils"
 )
@@ -30,6 +31,7 @@ func Test_TextSend(t *testing.T) {
 		if result.Status == SuccessStatus {
 			break
 		}
+		time.Sleep(10 * time.Second)
 	}
 
 }

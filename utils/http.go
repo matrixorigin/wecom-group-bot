@@ -85,7 +85,7 @@ func PostWithRetry(url URL, body []byte, retryTimes int, retryDuration time.Dura
 		if err == nil {
 			break
 		}
-		if err != nil && !errors.Is(err, ErrHttpRequest) {
+		if !errors.Is(err, ErrHttpRequest) {
 			break
 		}
 		time.Sleep(retryDuration)

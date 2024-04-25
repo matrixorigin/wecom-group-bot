@@ -3,6 +3,7 @@ package wecom_group_bot
 import (
 	"errors"
 	"strings"
+	"time"
 )
 
 type NewsMessage struct {
@@ -54,6 +55,16 @@ func (n *News) DeepCopy() *News {
 
 func (n *News) Validate() error {
 	return n.Articles.Validate()
+}
+
+func (n *NewsMessage) SetBackOff(t time.Time) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (n *NewsMessage) GetBackOff() *time.Time {
+	//TODO implement me
+	panic("implement me")
 }
 
 type Article struct {
