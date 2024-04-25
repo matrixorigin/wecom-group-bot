@@ -5,13 +5,10 @@ import (
 	"strings"
 )
 
-func NewImageSender(image *Image) *Sender {
-	return &Sender{
-		webhook: "",
-		message: &ImageMessage{
-			Msgtype: ImageType,
-			Image:   image.DeepCopy(),
-		},
+func NewImageMessage(image *Image) Messager {
+	return &ImageMessage{
+		Msgtype: ImageType,
+		Image:   image.DeepCopy(),
 	}
 }
 

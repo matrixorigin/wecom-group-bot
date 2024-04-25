@@ -3,10 +3,13 @@ package wecom_group_bot
 import (
 	"fmt"
 	"testing"
+
+	"github.com/matrixorigin/wecom-group-bot/utils"
 )
 
 func Test_NewsSender(t *testing.T) {
-	sender := NewNewsSender(&News{
+	sender := NewSender(utils.MustGetEnv(WebhookEnvName))
+	message := NewNewsMessage(&News{
 		Articles: Articles{
 			{
 				Title:       "中秋节礼品领取",
@@ -16,12 +19,7 @@ func Test_NewsSender(t *testing.T) {
 			},
 		},
 	})
-	err := sender.InitFromENV()
-	if err != nil {
-		fmt.Printf("err: %v\n", err)
-		t.FailNow()
-	}
-	err = sender.Send()
+	err := sender.Send(message)
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
 		t.FailNow()
