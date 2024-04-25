@@ -2,17 +2,16 @@ package wecom_group_bot
 
 import "strings"
 
-func NewTextSender(message *Text) *Sender {
-	return &Sender{
-		webhook: "",
-		message: &TextMessage{
-			Msgtype: TextType,
-			Text:    message.DeepCopy(),
-		},
+func NewTextMessage(text *Text) *TextMessage {
+	return &TextMessage{
+		id:      -1,
+		Msgtype: TextType,
+		Text:    text.DeepCopy(),
 	}
 }
 
 type TextMessage struct {
+	id      int32
 	Msgtype string `json:"msgtype,omitempty"`
 	Text    *Text  `json:"text,omitempty"`
 }
@@ -23,6 +22,7 @@ func (t *TextMessage) GetType() string {
 
 func (t *TextMessage) DeepCopy() Messager {
 	dst := &TextMessage{
+		id:      t.id,
 		Msgtype: t.Msgtype,
 		Text:    t.Text.DeepCopy(),
 	}
@@ -35,6 +35,14 @@ func (t *TextMessage) SetType(messageType string) {
 
 func (t *TextMessage) Validate() error {
 	return nil
+}
+
+func (t *TextMessage) SetID(id int32) {
+	t.id = id
+}
+
+func (t *TextMessage) GetID() int32 {
+	return t.id
 }
 
 type Text struct {

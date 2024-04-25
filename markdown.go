@@ -6,19 +6,8 @@ import (
 	"strings"
 )
 
-func NewMarkdownSender(message *Markdown, mentionedList []string) *Sender {
-	message = message.DeepCopy()
-	message.SetMentionedList(mentionedList)
-	return &Sender{
-		webhook: "",
-		message: &MarkdownMessage{
-			Msgtype:  MarkdownType,
-			Markdown: message,
-		},
-	}
-}
-
 type MarkdownMessage struct {
+	id       int32
 	Msgtype  string    `json:"msgtype,omitempty"`
 	Markdown *Markdown `json:"markdown,omitempty"`
 }
@@ -33,6 +22,7 @@ func (m *MarkdownMessage) GetType() string {
 
 func (m *MarkdownMessage) DeepCopy() Messager {
 	return &MarkdownMessage{
+		id:      m.id,
 		Msgtype: m.Msgtype,
 		Markdown: &Markdown{
 			Content: strings.Clone(m.Markdown.Content),
@@ -45,6 +35,14 @@ func (m *MarkdownMessage) Validate() error {
 		return errors.Join(ErrInvalidType, errors.New("need is "+MarkdownType+" but got "+m.Msgtype))
 	}
 	return m.Markdown.Validate()
+}
+
+func (m *MarkdownMessage) SetID(id int32) {
+	m.id = id
+}
+
+func (m *MarkdownMessage) GetID() int32 {
+	return m.id
 }
 
 type Markdown struct {

@@ -5,17 +5,8 @@ import (
 	"strings"
 )
 
-func NewNewsSender(news *News) *Sender {
-	return &Sender{
-		webhook: "",
-		message: &NewsMessage{
-			Msgtype: NewsType,
-			News:    news.DeepCopy(),
-		},
-	}
-}
-
 type NewsMessage struct {
+	id      int32
 	Msgtype string `json:"msgtype,omitempty"`
 	News    *News  `json:"news,omitempty"`
 }
@@ -30,6 +21,7 @@ func (n *NewsMessage) GetType() string {
 
 func (n *NewsMessage) DeepCopy() Messager {
 	return &NewsMessage{
+		id:      n.id,
 		Msgtype: strings.Clone(n.Msgtype),
 		News:    n.News.DeepCopy(),
 	}
@@ -40,6 +32,14 @@ func (n *NewsMessage) Validate() error {
 		return errors.Join(ErrInvalidType, errors.New("need is "+NewsType+" but got "+n.Msgtype))
 	}
 	return n.News.Validate()
+}
+
+func (n *NewsMessage) SetID(id int32) {
+	n.id = id
+}
+
+func (n *NewsMessage) GetID() int32 {
+	return n.id
 }
 
 type News struct {
