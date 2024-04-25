@@ -9,25 +9,23 @@ import (
 
 type Sender struct {
 	webhook string
-	message Messager
 }
 
-func (s *Sender) InitFromENV() error {
-	s.webhook = utils.MustGetEnv(WebhookEnvName)
-	return nil
+func NewSender(webhook string) *Sender {
+	return &Sender{
+		webhook: webhook,
+	}
 }
 
-func (s *Sender) InitFromFile(path string) error {
-	// TODO: generate sender from config file
-	return nil
-}
-
-func (s *Sender) Send() error {
+func (s *Sender) Send(message Messager) error {
+	if err := message.Validate(); err != nil {
+		return err
+	}
 	if err := s.Validate(); err != nil {
 		return err
 	}
 
-	payload, err := json.Marshal(s.message)
+	payload, err := json.Marshal(message)
 	if err != nil {
 		return err
 	}
@@ -42,7 +40,7 @@ func (s *Sender) Validate() error {
 	if s.webhook == "" {
 		return ErrEmptyWebhook
 	}
-	return s.message.Validate()
+	return nil
 }
 
 type Messager interface {

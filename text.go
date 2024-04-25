@@ -2,13 +2,10 @@ package wecom_group_bot
 
 import "strings"
 
-func NewTextSender(message *Text) *Sender {
-	return &Sender{
-		webhook: "",
-		message: &TextMessage{
-			Msgtype: TextType,
-			Text:    message.DeepCopy(),
-		},
+func NewTextMessage(message *Text) Messager {
+	return &TextMessage{
+		Msgtype: TextType,
+		Text:    message.DeepCopy(),
 	}
 }
 

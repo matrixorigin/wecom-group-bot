@@ -6,15 +6,12 @@ import (
 	"strings"
 )
 
-func NewMarkdownSender(message *Markdown, mentionedList []string) *Sender {
+func NewMarkdownMessage(message *Markdown, mentionedList []string) Messager {
 	message = message.DeepCopy()
 	message.SetMentionedList(mentionedList)
-	return &Sender{
-		webhook: "",
-		message: &MarkdownMessage{
-			Msgtype:  MarkdownType,
-			Markdown: message,
-		},
+	return &MarkdownMessage{
+		Msgtype:  MarkdownType,
+		Markdown: message,
 	}
 }
 

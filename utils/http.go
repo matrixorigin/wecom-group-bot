@@ -85,7 +85,7 @@ func PostWithRetry(url URL, body []byte, retryTimes int, retryDuration time.Dura
 		if err == nil {
 			break
 		}
-		if err != nil && !errors.Is(err, ErrHttpRequest) {
+		if !errors.Is(err, ErrHttpRequest) {
 			break
 		}
 		time.Sleep(retryDuration)
@@ -114,7 +114,7 @@ func Get(url URL) (reply *Reply, err error) {
 		nil,
 	)
 	if err != nil {
-		return reply, errors.Join(ErrHttpRequest, err)
+		return reply, errors.Join(ErrHttpNewRequest, err)
 	}
 	return resolveReply(do(req))
 }
@@ -126,8 +126,9 @@ func Post(url URL, body []byte) (reply *Reply, err error) {
 		bytes.NewReader(body),
 	)
 	if err != nil {
-		return reply, errors.Join(ErrHttpRequest, err)
+		return reply, errors.Join(ErrHttpNewRequest, err)
 	}
+
 	return resolveReply(do(req))
 }
 

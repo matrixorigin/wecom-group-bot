@@ -3,22 +3,21 @@ package wecom_group_bot
 import (
 	"fmt"
 	"testing"
+
+	"github.com/matrixorigin/wecom-group-bot/utils"
 )
 
 func Test_MarkDownSender(t *testing.T) {
-	sender := NewMarkdownSender(&Markdown{
+	sender := NewSender(utils.MustGetEnv(WebhookEnvName))
+	message := NewMarkdownMessage(&Markdown{
 		Content: `# test test
 		> ref test
 
 ## title 2
 `,
 	}, []string{"JiejieJia"})
-	err := sender.InitFromENV()
-	if err != nil {
-		fmt.Printf("err: %v\n", err)
-		t.FailNow()
-	}
-	err = sender.Send()
+
+	err := sender.Send(message)
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
 		t.FailNow()

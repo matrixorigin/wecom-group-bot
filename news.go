@@ -5,13 +5,10 @@ import (
 	"strings"
 )
 
-func NewNewsSender(news *News) *Sender {
-	return &Sender{
-		webhook: "",
-		message: &NewsMessage{
-			Msgtype: NewsType,
-			News:    news.DeepCopy(),
-		},
+func NewNewsMessage(news *News) Messager {
+	return &NewsMessage{
+		Msgtype: NewsType,
+		News:    news.DeepCopy(),
 	}
 }
 
