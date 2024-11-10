@@ -1,40 +1,43 @@
 package wecom_group_bot
 
 import (
-	"errors"
 	"strings"
+
+	"github.com/matrixorigin/wecom-group-bot/internal/wberr"
 )
 
 func NewImageMessage(image *Image) Messager {
 	return &ImageMessage{
-		Msgtype: ImageType,
+		Msgtype: MessageTypeImage,
 		Image:   image.DeepCopy(),
 	}
 }
 
 type ImageMessage struct {
-	Msgtype string `json:"msgtype,omitempty"`
-	Image   *Image `json:"image,omitempty"`
+	Msgtype MessageType `json:"msgtype,omitempty"`
+	Image   *Image      `json:"image,omitempty"`
 }
 
-func (i *ImageMessage) SetType(messageType string) {
+func (i *ImageMessage) SetType(messageType MessageType) {
 	i.Msgtype = messageType
 }
 
-func (i *ImageMessage) GetType() string {
+func (i *ImageMessage) GetType() MessageType {
 	return i.Msgtype
 }
 
 func (i *ImageMessage) DeepCopy() Messager {
 	return &ImageMessage{
-		Msgtype: strings.Clone(i.Msgtype),
+		Msgtype: i.Msgtype,
 		Image:   i.Image.DeepCopy(),
 	}
 }
 
 func (i *ImageMessage) Validate() error {
-	if i.Msgtype != ImageType {
-		return errors.Join(ErrInvalidType, errors.New("need is "+ImageType+" but got "+i.Msgtype))
+	if i.Msgtype != MessageTypeImage {
+		return wberr.OverrideError(wberr.ErrInvalidType,
+			wberr.WithMessage("need is "+MessageTypeImage.String()+" but got "+i.Msgtype.String()),
+		)
 	}
 	return i.Image.Validate()
 }

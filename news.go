@@ -1,40 +1,43 @@
 package wecom_group_bot
 
 import (
-	"errors"
 	"strings"
+
+	"github.com/matrixorigin/wecom-group-bot/internal/wberr"
 )
 
 func NewNewsMessage(news *News) Messager {
 	return &NewsMessage{
-		Msgtype: NewsType,
+		Msgtype: MessageTypeNews,
 		News:    news.DeepCopy(),
 	}
 }
 
 type NewsMessage struct {
-	Msgtype string `json:"msgtype,omitempty"`
-	News    *News  `json:"news,omitempty"`
+	Msgtype MessageType `json:"msgtype,omitempty"`
+	News    *News       `json:"news,omitempty"`
 }
 
-func (n *NewsMessage) SetType(messageType string) {
+func (n *NewsMessage) SetType(messageType MessageType) {
 	n.Msgtype = messageType
 }
 
-func (n *NewsMessage) GetType() string {
+func (n *NewsMessage) GetType() MessageType {
 	return n.Msgtype
 }
 
 func (n *NewsMessage) DeepCopy() Messager {
 	return &NewsMessage{
-		Msgtype: strings.Clone(n.Msgtype),
+		Msgtype: n.Msgtype,
 		News:    n.News.DeepCopy(),
 	}
 }
 
 func (n *NewsMessage) Validate() error {
-	if n.Msgtype != NewsType {
-		return errors.Join(ErrInvalidType, errors.New("need is "+NewsType+" but got "+n.Msgtype))
+	if n.Msgtype != MessageTypeNews {
+		return wberr.OverrideError(wberr.ErrInvalidType,
+			wberr.WithMessage("need is "+MessageTypeNews.String()+" but got "+n.Msgtype.String()),
+		)
 	}
 	return n.News.Validate()
 }

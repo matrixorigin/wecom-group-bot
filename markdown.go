@@ -1,30 +1,31 @@
 package wecom_group_bot
 
 import (
-	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/matrixorigin/wecom-group-bot/internal/wberr"
 )
 
 func NewMarkdownMessage(message *Markdown, mentionedList []string) Messager {
 	message = message.DeepCopy()
 	message.SetMentionedList(mentionedList)
 	return &MarkdownMessage{
-		Msgtype:  MarkdownType,
+		Msgtype:  MessageTypeMarkdown,
 		Markdown: message,
 	}
 }
 
 type MarkdownMessage struct {
-	Msgtype  string    `json:"msgtype,omitempty"`
-	Markdown *Markdown `json:"markdown,omitempty"`
+	Msgtype  MessageType `json:"msgtype,omitempty"`
+	Markdown *Markdown   `json:"markdown,omitempty"`
 }
 
-func (m *MarkdownMessage) SetType(messageType string) {
+func (m *MarkdownMessage) SetType(messageType MessageType) {
 	m.Msgtype = messageType
 }
 
-func (m *MarkdownMessage) GetType() string {
+func (m *MarkdownMessage) GetType() MessageType {
 	return m.Msgtype
 }
 
@@ -38,8 +39,10 @@ func (m *MarkdownMessage) DeepCopy() Messager {
 }
 
 func (m *MarkdownMessage) Validate() error {
-	if m.Msgtype != MarkdownType {
-		return errors.Join(ErrInvalidType, errors.New("need is "+MarkdownType+" but got "+m.Msgtype))
+	if m.Msgtype != MessageTypeMarkdown {
+		return wberr.OverrideError(wberr.ErrInvalidType,
+			wberr.WithMessage("need is "+MessageTypeMarkdown.String()+" but got "+m.Msgtype.String()),
+		)
 	}
 	return m.Markdown.Validate()
 }

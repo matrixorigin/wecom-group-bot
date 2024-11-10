@@ -8,7 +8,7 @@ import (
 )
 
 func Test_MarkDownSender(t *testing.T) {
-	sender := NewSender(utils.MustGetEnv(WebhookKeyEnvName))
+	sender := NewSender(utils.MustGetEnv("WEBHOOK_KEY"))
 	message := NewMarkdownMessage(&Markdown{
 		Content: `# test test
 		> ref test

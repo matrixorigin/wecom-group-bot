@@ -8,7 +8,7 @@ import (
 )
 
 func Test_NewsSender(t *testing.T) {
-	sender := NewSender(utils.MustGetEnv(WebhookKeyEnvName))
+	sender := NewSender(utils.MustGetEnv("WEBHOOK_KEY"))
 	message := NewNewsMessage(&News{
 		Articles: Articles{
 			{

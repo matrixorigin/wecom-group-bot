@@ -4,18 +4,18 @@ import "strings"
 
 func NewTextMessage(message *Text) Messager {
 	return &TextMessage{
-		Msgtype: TextType,
+		Msgtype: MessageTypeText,
 		Text:    message.DeepCopy(),
 	}
 }
 
 type TextMessage struct {
-	Msgtype string `json:"msgtype,omitempty"`
-	Text    *Text  `json:"text,omitempty"`
+	Msgtype MessageType `json:"msgtype,omitempty"`
+	Text    *Text       `json:"text,omitempty"`
 }
 
-func (t *TextMessage) GetType() string {
-	return TextType
+func (t *TextMessage) GetType() MessageType {
+	return MessageTypeText
 }
 
 func (t *TextMessage) DeepCopy() Messager {
@@ -26,7 +26,7 @@ func (t *TextMessage) DeepCopy() Messager {
 	return dst
 }
 
-func (t *TextMessage) SetType(messageType string) {
+func (t *TextMessage) SetType(messageType MessageType) {
 	t.Msgtype = messageType
 }
 

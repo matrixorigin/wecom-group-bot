@@ -8,7 +8,7 @@ import (
 )
 
 func Test_TextSender(t *testing.T) {
-	sender := NewSender(utils.MustGetEnv(WebhookKeyEnvName))
+	sender := NewSender(utils.MustGetEnv("WEBHOOK_KEY"))
 	message := NewTextMessage(&Text{
 		Content:             "test test test",
 		MentionedList:       []string{""},

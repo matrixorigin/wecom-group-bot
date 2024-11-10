@@ -2,23 +2,23 @@ package wecom_group_bot
 
 import (
 	"encoding/json"
-	"time"
 
+	"github.com/matrixorigin/wecom-group-bot/internal"
+	"github.com/matrixorigin/wecom-group-bot/internal/wberr"
 	"github.com/matrixorigin/wecom-group-bot/utils"
 )
 
-const (
-	NoticePrefix      = "https://qyapi.weixin.qq.com/cgi-bin/webhook/send"
-	UploadMediaPrefix = "https://qyapi.weixin.qq.com/cgi-bin/webhook/upload_media"
-)
-
 type Sender struct {
-	key string
+	key            string
+	messageSendURL string
+	mediaSendURL   string
 }
 
 func NewSender(key string) *Sender {
 	return &Sender{
-		key: key,
+		key:            key,
+		messageSendURL: internal.GenURL(NoticePrefix, "?key=", key),
+		mediaSendURL:   internal.GenURL(UploadMediaPrefix, "?key=", key),
 	}
 }
 
@@ -26,42 +26,31 @@ func (s *Sender) Send(message Messager) error {
 	if err := message.Validate(); err != nil {
 		return err
 	}
-	if err := s.Validate(); err != nil {
-		return err
-	}
-
-	url := utils.URL{
-		Params: map[string]string{
-			"key": s.key,
-		},
-	}
 	switch message.GetType() {
-	case MediaType:
-		url.Endpoint = UploadMediaPrefix
-		return utils.UploadMedia(url)
-	case TextType, MarkdownType, ImageType, NewsType, FileType, VoiceType, CardType:
-		url.Endpoint = NoticePrefix
+	case MessageTypeMedia:
+		return utils.UploadMedia(s.mediaSendURL)
+	case MessageTypeText, MessageTypeMarkdown, MessageTypeImage,
+		MessageTypeNews, MessageTypeFile, MessageTypeVoice, MessageTypeCard:
 		payload, err := json.Marshal(message)
 		if err != nil {
-			return err
+			return wberr.NewErrorFromError(err)
 		}
-		_, err = utils.PostWithRetry(url, payload, 5, 10*time.Second)
-		return err
+		return internal.Post(s.messageSendURL, internal.DefaultRestRequiredHeader(), payload)
 	default:
-		return ErrInvalidType
+		return wberr.ErrInvalidType
 	}
 }
 
 func (s *Sender) Validate() error {
 	if s.key == "" {
-		return ErrEmptyWebhookKey
+		return wberr.ErrEmptyWebhookKey
 	}
 	return nil
 }
 
 type Messager interface {
-	SetType(messageType string)
-	GetType() string
+	SetType(messageType MessageType)
+	GetType() MessageType
 	DeepCopy() Messager
 	Validate() error
 }

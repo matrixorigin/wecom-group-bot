@@ -11,7 +11,7 @@ import (
 )
 
 func Test_ImageSender(t *testing.T) {
-	sender := NewSender(utils.MustGetEnv(WebhookKeyEnvName))
+	sender := NewSender(utils.MustGetEnv("WEBHOOK_KEY"))
 
 	content, err := os.ReadFile("./cat.jpg")
 	if err != nil {
